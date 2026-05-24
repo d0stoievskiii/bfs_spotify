@@ -1,0 +1,14 @@
+asgiref==3.11.1
+async-timeout==5.0.1
+certifi==2026.5.20
+charset-normalizer==3.4.7
+Django==5.2.14
+django-environ==0.13.0
+django-redis==6.0.0
+idna==3.16
+redis==7.4.0
+requests==2.34.2
+spotipy==2.26.0
+sqlparse==0.5.5
+tzdata==2026.2
+urllib3==2.7.0
