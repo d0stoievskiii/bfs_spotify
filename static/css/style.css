@@ -1,0 +1,14 @@
+/* static/css/style.css */
+body {
+    background-color: #191414 !important; 
+}
+
+.btn-primary {
+    background-color: #1DB954;
+    border-color: #1DB954;
+}
+
+.btn-primary:hover {
+    background-color: #1ed760;
+    border-color: #1ed760;
+}
