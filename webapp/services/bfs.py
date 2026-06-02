@@ -1,4 +1,5 @@
 from typing import List, Callable, Optional, Set
+from collections import deque
 
 class NoPathFoundError(Exception):
     pass
@@ -13,11 +14,11 @@ def encontrar_conexao_artistas(
     if artista_origem == artista_destino:
         return [artista_origem]
 
-    fila: List[tuple[str, List[str]]] = [(artista_origem, [artista_origem])]
+    fila = deque([(artista_origem, [artista_origem])])
     visitados: Set[str] = {artista_origem}
 
     while fila:
-        artista_atual, caminho_atual = fila.pop(0)
+        artista_atual, caminho_atual = fila.popleft()
 
         if len(caminho_atual) > grau_maximo:
             continue
