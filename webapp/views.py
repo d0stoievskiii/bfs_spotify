@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from .services.bfs import encontrar_conexao_artistas
 from .services.adapters import adaptador_api_para_bfs
 from .services.formatters import formatar_caminho_para_arvore
+from django.shortcuts import render
 
 def index(request):
     return render(request, 'index.html')
