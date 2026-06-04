@@ -21,21 +21,110 @@
             <h1 class="display-4 fw-bold">Six Degrees of Spotify</h1>
             <p class="lead">Esses artistas estão conectados de alguma forma?</p>
             <p class="lead">Vamos descobrir!</p>
-            <form class="justify-content-center mt-4">
-                <div class="row">
-                    <div class="col md-4">
-                        <label class="form-label">Artista 1</label>
-                        <input type="text" class="form-control" id="artist1" placeholder="ex. Anitta">
+            <form id="form-busca">
+                <div class="row justify-content-center mb-4">
+                    <div class="col-md-5">
+                        <label class="text-light mb-2">Artista 1</label>
+                        <input type="text" id="input-origem" class="form-control" placeholder="ex. Anitta" required>
                     </div>
-                    <div class="col md-4">
-                        <label class="form-label">Artista 2</label>
-                        <input type="text" class="form-control" id="artist2" placeholder="ex. Nirvana">
+                    <div class="col-md-5">
+                        <label class="text-light mb-2">Artista 2</label>
+                        <input type="text" id="input-destino" class="form-control" placeholder="ex. Nirvana" required>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary mt-4">Descobrir Conexão</button>
+                <button type="submit" class="btn btn-success" id="btn-buscar">
+                    <span id="btn-texto">Descobrir Conexão</span>
+                    <span id="btn-loading" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
             </form>
+
+            <div id="area-resultado" class="mt-5 border-top border-secondary pt-5 d-none">
+                <h3 class="text-light" id="texto-conexao"></h3>
+                <div id="lista-artistas" class="d-flex justify-content-center align-items-center flex-wrap gap-4 mt-4">
+                </div>
+            </div>
+    
+            <div id="area-erro" class="mt-4 alert alert-danger d-none" role="alert"></div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script>
+            document.getElementById('form-busca').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const origem = document.getElementById('input-origem').value;
+                const destino = document.getElementById('input-destino').value;
+
+                const btnTexto = document.getElementById('btn-texto');
+                const btnLoading = document.getElementById('btn-loading');
+                const areaResultado = document.getElementById('area-resultado');
+                const areaErro = document.getElementById('area-erro');
+                const listaArtistas = document.getElementById('lista-artistas');
+                const textoConexao = document.getElementById('texto-conexao');
+                const btnBuscar = document.getElementById('btn-buscar');
+
+                areaResultado.classList.add('d-none');
+                areaErro.classList.add('d-none');
+                btnTexto.classList.add('d-none');
+                btnLoading.classList.remove('d-none');
+                listaArtistas.innerHTML = '';
+
+                btnBuscar.disabled = true;
+
+                try {
+                    const url = `/api/buscar?origem=${encodeURIComponent(origem)}&destino=${encodeURIComponent(destino)}`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.erro || "Ocorreu um erro ao buscar a conexão.");
+                    }
+
+                    const caminhoLinear = [];
+                    let noAtual = Object.keys(data).length === 0 ? null : data; 
+
+                    while (noAtual) {
+                        caminhoLinear.push({nome: noAtual.nome, imagem: noAtual.imagem});
+                        if (noAtual.filhos && noAtual.filhos.length > 0) {
+                            noAtual = noAtual.filhos[0];
+                        } else {
+                            noAtual = null;
+                        }
+                    }
+
+                    const graus = caminhoLinear.length > 2 ? caminhoLinear.length - 2 : 0;
+                    textoConexao.innerHTML = `${origem} e ${destino} são conectados através de <span class="text-success">${graus}</span> artistas`;
+                    
+                    caminhoLinear.forEach((artista, index) => {
+                        const divArtista = document.createElement('div');
+                        divArtista.className = 'text-center';
+                        divArtista.innerHTML = `
+                            <img src="${artista.imagem}" alt="${artista.nome}" class="rounded-circle border border-success border-3" style="width: 120px; height: 120px; object-fit: cover;">
+                            <p class="text-light mt-2 fw-bold">${artista.nome}</p>
+                        `;
+                        listaArtistas.appendChild(divArtista);
+
+                        if (index < caminhoLinear.length - 1) {
+                            const divSeta = document.createElement('div');
+                            divSeta.className = 'text-secondary fs-3';
+                            divSeta.innerText = '➔';
+                            listaArtistas.appendChild(divSeta);
+                        }
+                    });
+
+                    areaResultado.classList.remove('d-none');
+
+                } catch (error) {
+                    areaErro.innerText = error.message;
+                    areaErro.classList.remove('d-none');
+                } finally {
+                    btnTexto.classList.remove('d-none');
+                    btnLoading.classList.add('d-none');
+                    btnBuscar.disabled = false;
+                    document.getElementById('input-origem').value = '';
+                    document.getElementById('input-destino').value = '';
+                }
+            });
+        </script>
     </body>
 </html>

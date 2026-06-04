@@ -3,12 +3,12 @@ body {
     background-color: #191414 !important; 
 }
 
-.btn-primary {
+.btn-success {
     background-color: #1DB954;
     border-color: #1DB954;
 }
 
-.btn-primary:hover {
+.btn-success:hover {
     background-color: #1ed760;
     border-color: #1ed760;
 }
