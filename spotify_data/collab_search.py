@@ -9,6 +9,8 @@ def get_artist_name_by_rowid(artist_rowid):
         FROM artists
         WHERE id = {artist_rowid}
         """).df()
+    if (len(s.index) == 0):
+        raise Exception(f"Nenhum artista encontrado com id {artist_rowid}")
     return s
 
 def get_artist_rowid_by_name(artist_name):
@@ -18,7 +20,7 @@ def get_artist_rowid_by_name(artist_name):
         WHERE name_normalized = '{artist_name.lower()}'
         """).df()
     if (len(s.index) == 0):
-        return None
+        raise Exception(f"Nenhum artista encontrado com nome {artist_name}")
     if (len(s.index) > 1):
         return s.sort_values(by="popularity", ascending=False)["id"][0]
     else:
