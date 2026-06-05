@@ -8,7 +8,7 @@
 Exemplo de uso:
 
 ```
-from spotify_data.collab_search import bfs
+from spotify_data.collab_search import *
 bfs(int(get_artist_rowid_by_name("Jay-Z")), int(get_artist_rowid_by_name("Tim Maia")))
 ```
 
