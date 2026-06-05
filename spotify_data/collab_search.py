@@ -34,6 +34,16 @@ def expand_frontier(frontier, visited):
 
     return rows
 
+def expand_frontier_by_name(artist_name: str) -> list[str]:
+    artist_rowid = get_artist_rowid_by_name(artist_name)
+    rows = con.execute(f"""
+        SELECT source_id, target_id
+        FROM artist_edges
+        WHERE source_id = {artist_rowid}
+    """).fetchall()
+
+    return [get_artist_name_by_rowid(int(r[1]))["name"][0] for r in rows]
+
 
 def bfs(start_id, target_id, max_depth=6):
     visited = {start_id}
