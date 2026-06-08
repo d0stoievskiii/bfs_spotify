@@ -1,9 +1,13 @@
 from django.http import JsonResponse
+from django.db.models import Case, When, IntegerField
 from .services.bfs import encontrar_conexao_artistas
 from .services.adapters import adaptador_api_para_bfs
 from .services.formatters import formatar_caminho_para_arvore
 from spotify_integration.client import get_token, search_for_artist
 from django.shortcuts import render
+
+from spotify_data.collab_search import *
+from .models import Artist
 
 def index(request):
     return render(request, 'index.html')
@@ -19,12 +23,7 @@ def buscar_conexao_view(request):
             status=400
         )
 
-    caminho = encontrar_conexao_artistas(
-        artista_origem=origem,
-        artista_destino=destino,
-        funcao_buscar_vizinhos=adaptador_api_para_bfs,
-        grau_maximo=3
-    )
+    caminho = bfs(int(get_artist_rowid_by_name(origem)), int(get_artist_rowid_by_name(destino)))
 
     if not caminho:
         return JsonResponse(
@@ -47,3 +46,25 @@ def buscar_conexao_view(request):
     arvore_json = formatar_caminho_para_arvore(caminho, cache_imagens_final)
 
     return JsonResponse(arvore_json, json_dumps_params={'ensure_ascii': False})
+
+
+def normalize_query(value: str) -> str:
+    return value.strip().lower()
+
+
+def artist_autocomplete(request):
+    query = normalize_query(request.GET.get("q", ""))
+
+    if len(query) < 2:
+        return JsonResponse({"results": []})
+
+    artists = (
+        Artist.objects
+        .filter(name_normalized__startswith=query)
+        .order_by("-popularity", "-followers_total", "name")
+        .values("id", "name", "popularity", "followers_total")[:20]
+    )
+
+    return JsonResponse({"results": list(artists)})
+
+

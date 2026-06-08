@@ -14,11 +14,11 @@ def get_artist_name_by_rowid(artist_rowid):
     return s
 
 def get_artist_rowid_by_name(artist_name):
-    s = con.execute(f"""
+    s = con.execute("""
         SELECT id, popularity
         FROM artists
-        WHERE name_normalized = '{artist_name.lower()}'
-        """).df()
+        WHERE name_normalized = ?
+        """,[str(artist_name).strip().lower()]).df()
     if (len(s.index) == 0):
         raise Exception(f"Nenhum artista encontrado com nome {artist_name}")
     if (len(s.index) > 1):
@@ -47,7 +47,7 @@ def expand_frontier_by_name(artist_name: str) -> list[str]:
     return [get_artist_name_by_rowid(int(r[1]))["name"][0] for r in rows]
 
 
-def bfs(start_id, target_id, max_depth=6):
+def bfs(start_id, target_id, max_depth=10):
     visited = {start_id}
     frontier = {start_id}
     parent = {start_id: None}
