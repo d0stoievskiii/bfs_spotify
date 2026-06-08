@@ -16,3 +16,17 @@ bfs(int(get_artist_rowid_by_name("Jay-Z")), int(get_artist_rowid_by_name("Tim Ma
 ['JAY-Z', 'Jeymes Samuel', 'Jorge Ben Jor', 'Tim Maia']
 ```
 
+
+## autocomplete (db secundario)
+crie o schema do dabatase
+
+```
+python manage.py migrate
+```
+migre a tabela artista do duckdb para o sqlite
+```
+python manage.py migrate_artists --clear
+```
+
+autocomplete deve estar funcional
+
