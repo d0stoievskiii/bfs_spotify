@@ -25,7 +25,7 @@ python manage.py migrate
 ```
 migre a tabela artista do duckdb para o sqlite
 ```
-python manage.py migrate_artists --clear
+python manage.py import_artists --clear
 ```
 
 autocomplete deve estar funcional
