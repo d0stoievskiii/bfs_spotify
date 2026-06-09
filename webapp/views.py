@@ -1,13 +1,19 @@
-from django.http import JsonResponse
 import logging
+from django.http import JsonResponse
+from django.shortcuts import render
 
 from webapp.services.orchestrator import buscar_conexao_inteligente
 from webapp.services.formatters import formatar_caminho_para_arvore
+from webapp.models import Artist
 from spotify_integration.client import get_token, search_for_artist
 
 logger = logging.getLogger(__name__)
 
+def index(request):
+    return render(request, 'index.html')
+
 def buscar_conexao_view(request):
+
     origem = request.GET.get('origem')
     destino = request.GET.get('destino')
 
@@ -36,3 +42,23 @@ def buscar_conexao_view(request):
 
     arvore_json = formatar_caminho_para_arvore(caminho, cache_imagens_final)
     return JsonResponse(arvore_json, json_dumps_params={'ensure_ascii': False})
+
+def normalize_query(value: str) -> str:
+    """Normaliza strings para busca segura no banco."""
+    return value.strip().lower()
+
+def artist_autocomplete(request):
+
+    query = normalize_query(request.GET.get("q", ""))
+
+    if len(query) < 2:
+        return JsonResponse({"results": []})
+
+    artists = (
+        Artist.objects
+        .filter(name_normalized__startswith=query)
+        .order_by("-popularity", "-followers_total", "name")
+        .values("id", "name", "popularity", "followers_total")[:20]
+    )
+
+    return JsonResponse({"results": list(artists)})
