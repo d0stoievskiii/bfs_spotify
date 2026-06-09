@@ -23,20 +23,25 @@ def buscar_conexao_view(request):
     caminho = buscar_conexao_inteligente(origem, destino)
 
     if not caminho:
-        return JsonResponse(
-            {"erro": "Nenhuma conexão encontrada nas bases de dados."},
-            status=404
-        )
+        return JsonResponse({"erro": "Nenhuma conexão encontrada nas bases de dados."}, status=404)
 
     cache_imagens_final = {}
     try:
         token = get_token()
-        for nome_artista in caminho:
-            dados_spotify = search_for_artist(token, nome_artista)
-            
-            if dados_spotify and dados_spotify.get("images"):
-                chave_limpa = nome_artista.strip().lower()
-                cache_imagens_final[chave_limpa] = dados_spotify["images"][0]["url"]
+
+        def buscar_imagem_individual(nome_artista):
+            dados = search_for_artist(token, nome_artista)
+            if dados and dados.get("images"):
+                return nome_artista, dados["images"][0]["url"]
+            return nome_artista, None
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            resultados = executor.map(buscar_imagem_individual, caminho)
+
+        for nome, url in resultados:
+            if url:
+                cache_imagens_final[nome.strip().lower()] = url
+
     except Exception as e:
         logger.warning(f"Aviso: Falha ao carregar imagens do Spotify: {e}")
 
@@ -44,7 +49,6 @@ def buscar_conexao_view(request):
     return JsonResponse(arvore_json, json_dumps_params={'ensure_ascii': False})
 
 def normalize_query(value: str) -> str:
-    """Normaliza strings para busca segura no banco."""
     return value.strip().lower()
 
 def artist_autocomplete(request):
