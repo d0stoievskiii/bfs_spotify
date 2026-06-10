@@ -1,7 +1,11 @@
 import duckdb
 from collections import deque
 
-con = duckdb.connect("spotify_data/data/spotify_graph.duckdb", read_only=True)
+try:
+    con = duckdb.connect("spotify_data/data/spotify_graph.duckdb", read_only=True)
+except Exception as e:
+    con = None
+    print(f"Aviso: Banco DuckDB não encontrado. O sistema irá usar o fallback do Last.fm. Erro: {e}")
 
 def get_artist_name_by_rowid(artist_rowid):
     s = con.execute(f"""
