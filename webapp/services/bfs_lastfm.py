@@ -4,13 +4,13 @@ from spotify_integration.client import get_similar_artists
 
 def obter_vizinhos_lastfm(nome_artista: str) -> List[str]:
     try:
-        dados = get_similar_artists(nome_artista, limit=10)
+        dados = get_similar_artists(nome_artista, limit=30)
         return [artista["name"] for artista in dados]
     except Exception as e:
         print(f"Erro na API Last.fm para {nome_artista}: {e}")
         return []
 
-def bfs_via_api(artista_origem: str, artista_destino: str, max_depth: int = 2) -> Optional[List[str]]:
+def bfs_via_api(artista_origem: str, artista_destino: str, max_depth: int = 3) -> Optional[List[str]]:
 
     if artista_origem.lower() == artista_destino.lower():
         return [artista_origem]

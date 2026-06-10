@@ -22,7 +22,7 @@ def buscar_conexao_inteligente(origem: str, destino: str) -> Optional[List[str]]
     logger.info(f"Iniciando Fallback Last.fm para: {origem} -> {destino}")
     
     try:
-        caminho_lastfm = bfs_via_api(origem, destino, max_depth=2) 
+        caminho_lastfm = bfs_via_api(origem, destino, max_depth=3)
         
         if caminho_lastfm:
             logger.info("Conexão encontrada via Last.fm API!")
