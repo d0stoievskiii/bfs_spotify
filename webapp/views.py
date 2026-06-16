@@ -3,8 +3,8 @@ import concurrent.futures
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from webapp.services.orchestrator import buscar_conexao_inteligente
-from webapp.services.formatters import formatar_caminho_para_arvore
+from .services.orchestrator import buscar_conexao_inteligente
+from .services.formatters import formatar_caminho_para_arvore
 from webapp.models import Artist
 from spotify_integration.client import get_token, search_for_artist
 
