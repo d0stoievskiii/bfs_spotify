@@ -121,14 +121,14 @@ def plot_network_expansion(levels_data: list, artist_name: str):
     plt.show()
 
 if __name__ == "__main__":
-    artist = "MOZART"
+    artist = "Marília Mendonça"
     
     print("=" * 60)
     print(f"Análise de Rede de Colaboração DuckDB")
     print("=" * 60)
     
     # Explore the network
-    network_data = explore_artist_network(artist, max_depth=20)
+    network_data = explore_artist_network(artist, max_depth=10)
     
     if network_data:
         print("\n" + "=" * 60)

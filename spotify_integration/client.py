@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 import base64
-from requests import post, get
+from requests import post, get, RequestException
 import json
 import time
 import threading
@@ -84,6 +84,34 @@ def search_for_artist(token, artist_name):
         print("Nenhum artista com esse nome encontrado...")
         return None
     return items[0]
+
+def search_for_artist_unsafe(token, artist_name):
+
+    try:
+        url = "https://api.spotify.com/v1/search"
+        headers = get_auth_header(token)
+        query = f"?q={artist_name}&type=artist&limit=1"
+
+        response = get(
+            url + query,
+            headers=headers,
+            timeout=3
+        )
+
+        if response.status_code != 200:
+            return None
+
+        items = response.json()["artists"]["items"]
+
+        if not items:
+            return None
+        return items[0]
+
+    except RequestException:
+        return None
+
+    except Exception:
+        return None
 
 # retorna todos os álbuns de um artista dado seu id
 def get_all_albums(token, artist_id):

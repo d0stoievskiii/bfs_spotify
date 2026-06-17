@@ -96,3 +96,27 @@ def reconstruct_path(parent, start_id, target_id):
     return [get_artist_name_by_rowid(int(p))["name"][0] for p in path]
     
 
+def explore_levels(start_id, max_depth=6):
+    visited = {start_id}
+    frontier = {start_id}
+    levels = {0: {start_id}}
+
+    for depth in range(1, max_depth + 1):
+
+        rows = expand_frontier(frontier, visited)
+        next_frontier = set()
+
+        for _, target in rows:
+            if target in visited:
+                continue
+
+            visited.add(target)
+            next_frontier.add(target)
+
+        if not next_frontier:
+            break
+
+        levels[depth] = next_frontier
+        frontier = next_frontier
+
+    return levels
